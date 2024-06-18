@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ExpensesScreen extends StatelessWidget {
   late ExpensesBloc expensesBloc;
-  String myName = '';
+  // String myName = '';
   String selectedContactName = '';
   ExpensesScreen({super.key});
 
@@ -86,7 +86,7 @@ class ExpensesScreen extends StatelessWidget {
                       return Text('Error: ${snapshot.error}');
                     } else {
                       final name = snapshot.data ?? 'No Name';
-                      myName = name;
+                      // myName = name;
                       return Text(name);
                     }
                   },
@@ -124,72 +124,92 @@ class ExpensesScreen extends StatelessWidget {
               height: 50,
             ),
 
-            BlocBuilder<ExpensesBloc, ExpensesState>(
-              builder: (context, state) {
-                expensesBloc = BlocProvider.of<ExpensesBloc>(context);
-                if (state is InitialAddExpenseState) {
-                  if (state.transactions.isEmpty) {
-                    return const Column(
-                      children: [
-                        Center(
-                          child: const Text('No Expenses yet!'),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: const Text(
-                              'Add an expense to start the party!!!'),
-                        )
-                      ],
-                    );
-                  }
-
-                  final totalowedmoney = CalculateAmount.calculateTotalOwed(
-                      myName, selectedContactName, state.transactions);
-                  String balancetext;
-                  if (totalowedmoney == 0) {
-                    balancetext = 'All Settled Up!!';
-                  } else if (totalowedmoney > 0) {
-                    balancetext =
-                        'You owe $totalowedmoney to $selectedContactName';
-                  } else {
-                    balancetext =
-                        '$selectedContactName owes you ${-totalowedmoney}';
-                  }
-                  return Expanded(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Text(balancetext),
-                        ),
-                        Expanded(
-                          child: ListView.builder(
-                            itemCount: state.transactions.length,
-                            itemBuilder: (context, index) {
-                              final transaction = state.transactions[index];
-                              final owingamount = transaction.amount / 2;
-                              final owingtext = transaction.payername == myName
-                                  ? 'You paid ${transaction.amount}'
-                                  : '${transaction.payername} paid ${transaction.amount}';
-
-                              return ListTile(
-                                leading: Icon(Icons.list_alt),
-                                title: Text(transaction.description),
-                                subtitle: Text(owingtext),
-                                trailing: Text(transaction.payername == myName
-                                    ? 'you lent $owingamount'
-                                    : 'you borrowed $owingamount'),
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+            FutureBuilder(
+              future: fetchusername(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error : ${snapshot.error}');
                 } else {
-                  return const Center(child: CircularProgressIndicator());
+                  final myName = snapshot.data ?? 'No Name';
+                  return BlocBuilder<ExpensesBloc, ExpensesState>(
+                    builder: (context, state) {
+                      expensesBloc = BlocProvider.of<ExpensesBloc>(context);
+                      if (state is InitialAddExpenseState) {
+                        if (state.transactions.isEmpty) {
+                          return const Column(
+                            children: [
+                              Center(
+                                child: const Text('No Expenses yet!'),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Center(
+                                child: const Text(
+                                    'Add an expense to start the party!!!'),
+                              )
+                            ],
+                          );
+                        }
+
+                        // myName = fetchusername() as String;
+                        // print('My name is : $myName');
+
+                        print('My name : $myName');
+                        final totalowedmoney =
+                            CalculateAmount.calculateTotalOwed(myName,
+                                selectedContactName, state.transactions);
+                        String balancetext;
+                        if (totalowedmoney == 0) {
+                          balancetext = 'All Settled Up!!';
+                        } else if (totalowedmoney > 0) {
+                          balancetext =
+                              'You owe $totalowedmoney to $selectedContactName';
+                        } else {
+                          balancetext =
+                              '$selectedContactName owes you ${-totalowedmoney}';
+                        }
+                        return Expanded(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: Text(balancetext),
+                              ),
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: state.transactions.length,
+                                  itemBuilder: (context, index) {
+                                    final transaction =
+                                        state.transactions[index];
+                                    final owingamount = transaction.amount / 2;
+                                    final owingtext = transaction.payername ==
+                                            myName
+                                        ? 'You paid ${transaction.amount}'
+                                        : '${transaction.payername} paid ${transaction.amount}';
+
+                                    return ListTile(
+                                      leading: Icon(Icons.list_alt),
+                                      title: Text(transaction.description),
+                                      subtitle: Text(owingtext),
+                                      trailing: Text(
+                                          transaction.payername == myName
+                                              ? 'you lent $owingamount'
+                                              : 'you borrowed $owingamount'),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    },
+                  );
                 }
               },
             ),
