@@ -2,7 +2,6 @@
 // import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class AuthEvent {}
 
@@ -41,20 +40,14 @@ class SignInState extends AuthState {}
 
 class SignUpState extends AuthState {}
 
-class SkipAuth extends AuthState {}
+// class SkipAuth extends AuthState {}
 
 class GoogleState extends AuthState {}
 
 //bloc
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc() : super(LoadingState()) {
-    on<OnInitialAuth>((event, emit) async {
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      final isUserLoggedIn = prefs.getBool('isUserLoggedIn') ?? false;
-      if (isUserLoggedIn) {
-        emit(SkipAuth());
-        return;
-      }
+    on<OnInitialAuth>((event, emit) {
       emit(InitialLoad(isSignIn: false));
     });
 

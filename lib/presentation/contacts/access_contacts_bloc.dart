@@ -79,12 +79,12 @@ class ContactSelectSuccess extends ContactState {
 class ContactBloc extends HydratedBloc<ContactEvent, ContactState> {
   ContactBloc() : super(ContactsInitial()) {
     on<InitialLoadContacts>((event, emit) async {
-      final storedcontactname =
-          fromJson(HydratedBloc.storage.read('ContactBloc') ?? {});
-      if (storedcontactname != null) {
-        emit(storedcontactname);
-        return;
-      }
+      // final storedcontactname =
+      //     fromJson(HydratedBloc.storage.read('ContactBloc') ?? {});
+      // if (storedcontactname != null) {
+      //   emit(storedcontactname);
+      //   return;
+      // }
       // Permission handling
       if (await Permission.contacts.isGranted) {
         emit(LoadingContacts());

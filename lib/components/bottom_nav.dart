@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/presentation/friends/friends.dart';
+import 'package:my_app/presentation/groups/create_group.dart';
 import 'package:my_app/presentation/profile/profile.dart';
 import 'package:my_app/presentation/home/home_page.dart';
+import 'package:my_app/presentation/search.dart';
 
 class BottomNavBar extends StatefulWidget {
   BottomNavBar({super.key});
@@ -11,12 +13,14 @@ class BottomNavBar extends StatefulWidget {
 }
 
 class _BottomNavBarState extends State<BottomNavBar> {
-  int selectindex = 0;
+  int selectedIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Widget> screens = [
     HomePage(),
-    FriendsList(),
+    const Search(),
+    const FriendsList(),
+    Container(),
   ];
 
   void openDrawer() {
@@ -29,20 +33,28 @@ class _BottomNavBarState extends State<BottomNavBar> {
       key: _scaffoldKey,
       endDrawer: ProfilePage(),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectindex,
         onTap: (index) {
-          if (index == 2) {
+          if (index == 3) {
             openDrawer();
           } else {
             setState(() {
-              selectindex = index;
+              selectedIndex = index;
             });
           }
         },
+        backgroundColor: const Color(0xff000080),
+        unselectedItemColor: Colors.grey,
+        selectedItemColor: Colors.white,
+        currentIndex: selectedIndex,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.group),
             label: "Groups",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: "Search",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -54,8 +66,23 @@ class _BottomNavBarState extends State<BottomNavBar> {
           ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xff000080),
+        foregroundColor: Colors.black,
+        hoverElevation: 10,
+        splashColor: Colors.grey,
+        tooltip: 'Add',
+        elevation: 4,
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) => CreateGroup()),
+          );
+        },
+      ),
       body: Center(
-        child: screens[selectindex],
+        child: screens[selectedIndex],
       ),
     );
   }

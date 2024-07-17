@@ -47,15 +47,27 @@ class InitialLoadingState extends ExpensesState {}
 
 // Bloc
 class ExpensesBloc extends HydratedBloc<ExpensesEvent, ExpensesState> {
-  ExpensesBloc() : super(InitialLoadingState()) {
+  final String groupname;
+  ExpensesBloc({required this.groupname}) : super(InitialLoadingState()) {
     on<OnInitialLoadExpense>((event, emit) {
-      final storedData = HydratedBloc.storage.read('ExpensesBloc');
-      if (storedData != null && storedData is Map) {
-        final storedexpenselist =
-            fromJson(Map<String, dynamic>.from(storedData as Map));
-        if (storedexpenselist != null) {
-          emit(storedexpenselist);
-        } else {
+      final storedData = HydratedBloc.storage.read('ExpensesBloc_$groupname');
+      print('Group name: $groupname');
+      print('Stored data: $storedData');
+      print('Stored data type: ${storedData.runtimeType}');
+
+      if (storedData != null) {
+        try {
+          final storedMap = _convertToStringKeyedMap(storedData);
+          final storedExpenseList = fromJson(storedMap);
+          print('Stored expense list: $storedExpenseList');
+
+          if (storedExpenseList != null) {
+            emit(storedExpenseList);
+          } else {
+            emit(InitialAddExpenseState(transactions: []));
+          }
+        } catch (e) {
+          print('Error in casting stored data: $e');
           emit(InitialAddExpenseState(transactions: []));
         }
       } else {
@@ -64,16 +76,33 @@ class ExpensesBloc extends HydratedBloc<ExpensesEvent, ExpensesState> {
     });
 
     on<OnAddExpense>((event, emit) {
-      final currentstate = state as InitialAddExpenseState;
-      final transactions = currentstate.transactions;
+      final currentState = state as InitialAddExpenseState;
+      final transactions = currentState.transactions;
       final newTransaction = Transaction(
-          description: event.description,
-          amount: event.amount,
-          payername: event.paidby);
+        description: event.description,
+        amount: event.amount,
+        payername: event.paidby,
+      );
 
-      emit(InitialAddExpenseState(
-          transactions: [newTransaction, ...transactions]));
+      final updatedTransactions = [newTransaction, ...transactions];
+      emit(InitialAddExpenseState(transactions: updatedTransactions));
+      persistState(InitialAddExpenseState(transactions: updatedTransactions));
     });
+  }
+
+  dynamic _convertToStringKeyedMap(dynamic data) {
+    if (data is Map) {
+      return data.map((key, value) {
+        final newKey =
+            key.toString(); // Convert key to string if it's not already
+        final newValue = _convertToStringKeyedMap(
+            value); // Recursively handle nested maps/lists
+        return MapEntry(newKey, newValue);
+      });
+    } else if (data is List) {
+      return data.map((item) => _convertToStringKeyedMap(item)).toList();
+    }
+    return data;
   }
 
   @override
@@ -94,5 +123,13 @@ class ExpensesBloc extends HydratedBloc<ExpensesEvent, ExpensesState> {
       return state.toJson();
     }
     return null;
+  }
+
+  @override
+  Future<void> persistState(ExpensesState state) async {
+    final stateJson = toJson(state);
+    if (stateJson != null) {
+      await HydratedBloc.storage.write('ExpensesBloc_$groupname', stateJson);
+    }
   }
 }

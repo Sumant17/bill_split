@@ -13,9 +13,10 @@ class Transaction {
 
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
-        description: json['description'],
-        amount: json['amount'],
-        payername: json['payername']);
+      description: json['description'],
+      amount: json['amount'],
+      payername: json['payername'],
+    );
   }
 
   Map<String, dynamic> toJson() {

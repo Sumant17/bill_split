@@ -18,6 +18,7 @@ class Introduction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
+      backgroundColor: const Color(0xff000080),
       splash: Padding(
         padding: const EdgeInsets.all(10),
         child: SizedBox(
@@ -40,35 +41,38 @@ class Introduction extends StatelessWidget {
                 showNextButton: true,
                 pages: [
                   PageViewModel(
-                    title: 'SPLITMAADI',
-                    bodyWidget: const Text('A Beautiful App'),
+                    title: 'What this app will do?',
+                    bodyWidget: const Text(
+                        'A Beautiful App featuring tracking of amount spent \n with group of friends/families.'),
                     image: Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8),
-                        child: Image.asset(''),
+                        child: Lottie.asset('assets/onboarding_1.json'),
                       ),
                     ),
                   ),
                   PageViewModel(
-                    title: 'SPLITMAADI',
-                    bodyWidget: const Text('A Beautiful App'),
+                    title: 'SPLITTER',
+                    bodyWidget: const Text(
+                        'Helps in tracking of amount owed to how many people within the groups.\n Ability to add friends/families in the group by accessing contacts of your phone.'),
                     image: Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8),
-                        child: Image.asset(''),
+                        child: Lottie.asset('assets/onboarding_1.json'),
                       ),
                     ),
                   ),
                   PageViewModel(
-                    title: 'SPLITMAADI',
-                    bodyWidget: const Text('A Beautiful App'),
+                    title: 'SPLITTER',
+                    bodyWidget:
+                        const Text('Ability to track list of groups created.'),
                     image: Align(
                       alignment: Alignment.bottomCenter,
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8),
-                        child: Image.asset(''),
+                        child: Lottie.asset('assets/onboarding_1.json'),
                       ),
                     ),
                   ),

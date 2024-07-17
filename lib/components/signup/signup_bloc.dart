@@ -14,6 +14,11 @@ class OnProfileClicked extends SignUpEvent {
   OnProfileClicked({required this.imagepath});
 }
 
+class OnPasswordShow extends SignUpEvent {
+  final bool isShow;
+  OnPasswordShow({required this.isShow});
+}
+
 class OnGenderChanged extends SignUpEvent {
   final String gender;
   OnGenderChanged({required this.gender});
@@ -41,6 +46,11 @@ class ProfileShow extends SignUpState {
   ProfileShow({required this.imagepath});
 }
 
+class PasswordShow extends SignUpState {
+  final bool isShow;
+  PasswordShow({required this.isShow});
+}
+
 class GenderShow extends SignUpState {
   final String gender;
   GenderShow({required this.gender});
@@ -52,21 +62,42 @@ class SignUpSuccess extends SignUpState {
   SignUpSuccess({required this.imagepath, required this.name});
 }
 
+class ErrorState extends SignUpState {
+  final String errorMessage;
+  ErrorState({required this.errorMessage});
+}
+
+// class ProfileLoading extends SignUpState {}
+
+class SignUpLoading extends SignUpState {}
+
 //bloc
 class SignupBloc extends Bloc<SignUpEvent, SignUpState> {
   late String _imagepath = '';
   late String _gender = '';
+  late bool _isShow = false;
+
+  bool isLoadingPage = false;
 
   SignupBloc() : super(SignUpInitial()) {
     on<OnProfileClicked>((event, emit) async {
+      // isLoadingProfile = true;
+      // emit(ProfileLoading());
       final picker = ImagePicker();
       final pickedFile = await picker.pickImage(source: ImageSource.camera);
       if (pickedFile != null) {
         _imagepath = pickedFile.path;
         emit(ProfileShow(imagepath: pickedFile.path));
+
         bool success = await FirebaseUtils.uploadFileForUser(pickedFile);
         print(success);
+        // isLoadingProfile = false;
       }
+    });
+
+    on<OnPasswordShow>((event, emit) {
+      _isShow = event.isShow;
+      emit(PasswordShow(isShow: event.isShow));
     });
 
     on<OnGenderChanged>((event, emit) {
@@ -75,6 +106,8 @@ class SignupBloc extends Bloc<SignUpEvent, SignUpState> {
     });
 
     on<OnSignUpButtonClicked>((event, emit) async {
+      isLoadingPage = true;
+      emit(SignUpLoading());
       try {
         final credential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
@@ -84,25 +117,44 @@ class SignupBloc extends Bloc<SignUpEvent, SignUpState> {
 
         await prefs.setString('myName', event.name);
         await prefs.setString('myimagepath', event.imagepath);
+        await prefs.setString('myEmail', event.email);
 
         print('Signed up successfully with userid : ${credential.user?.uid}');
         final user = MyUserModel(name: event.name, email: event.email);
         await FirebaseUtils.uploaduserdetails(user);
 
         emit(SignUpSuccess(imagepath: event.imagepath, name: event.name));
+        isLoadingPage = false;
       } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          print('The password provided is too weak.');
-        } else if (e.code == 'email-already-in-use') {
-          print('The account already exists for that email.');
+        isLoadingPage = true;
+        emit(SignUpLoading());
+        switch (e.code) {
+          case 'invalid-email':
+            emit(ErrorState(
+                errorMessage: 'Please provide a valid email address!'));
+            isLoadingPage = false;
+          case 'weak-password':
+            emit(ErrorState(errorMessage: 'Password provided is too weak!'));
+            isLoadingPage = false;
+
+          case 'email-already-in-use':
+            emit(ErrorState(
+                errorMessage:
+                    'The account already exists  for that email.Try Signing-in!'));
+            isLoadingPage = false;
+
+          default:
+            emit(ErrorState(
+                errorMessage: 'An Error occured .Please try again later!'));
+            isLoadingPage = false;
         }
-        throw Exception(e);
       }
     });
   }
   //getters
   String get imagepath => _imagepath;
   String get gender => _gender;
+  bool get isShow => _isShow;
 
   // @override
   // SignUpState? fromJson(Map<String, dynamic> json) {

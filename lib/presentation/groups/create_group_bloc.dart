@@ -53,6 +53,11 @@ class CreateGroupSuccessState extends CreateGroupState {
   }
 }
 
+class ErrorState extends CreateGroupState {
+  final String errorMessage;
+  ErrorState({required this.errorMessage});
+}
+
 //bloc
 class CreateGroupBloc extends HydratedBloc<CreateGroupEvent, CreateGroupState> {
   late String _imagepath = '';
@@ -68,8 +73,12 @@ class CreateGroupBloc extends HydratedBloc<CreateGroupEvent, CreateGroupState> {
     });
 
     on<OnDoneButtonClicked>((event, emit) {
-      emit(CreateGroupSuccessState(
-          name: event.name, imagepath: event.imagepath));
+      if (event.name.isEmpty) {
+        emit(ErrorState(errorMessage: 'Group Name cannot be empty!'));
+      } else {
+        emit(CreateGroupSuccessState(
+            name: event.name, imagepath: event.imagepath));
+      }
     });
   }
 

@@ -13,8 +13,9 @@ class CreateGroupList extends GroupEvent {
 }
 
 class UpdateGroupList extends GroupEvent {
+  final String groupname;
   final String friend;
-  UpdateGroupList({required this.friend});
+  UpdateGroupList({required this.friend, required this.groupname});
 }
 
 //states
@@ -70,7 +71,7 @@ class GroupBloc extends HydratedBloc<GroupEvent, GroupState> {
     on<UpdateGroupList>((event, emit) {
       final currentstate = state as InitialLoaded;
       final updatedgroups = currentstate.groups.map((group) {
-        if (group.groupname == currentstate.groups.last.groupname) {
+        if (group.groupname == event.groupname) {
           final updatedname = List<String>.from(group.names);
           updatedname.add(event.friend);
           return GroupsModel(
