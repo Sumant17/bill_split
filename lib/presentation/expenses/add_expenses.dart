@@ -46,7 +46,6 @@ class _AddExpensesState extends State<AddExpenses> {
               final description = descriptionController.text;
               final amount = double.tryParse(amountController.text) ?? 0.0;
               final payer = paidby;
-
               if (description.isEmpty ||
                   amount == null ||
                   amount <= 0 ||
@@ -132,56 +131,66 @@ class _AddExpensesState extends State<AddExpenses> {
                       }
                     },
                   ),
-                ],
-              ),
-              // BlocBuilder<SignupBloc, SignUpState>(
-              //   builder: (context, state) {
-              //     if (state is SignUpSuccess) {
-              //       return Row(
-              //         children: [
-              //           Radio<String>(
-              //             value: state.name,
-              //             groupValue: paidby,
-              //             onChanged: (value) {
-              //               setState(() {
-              //                 paidby = value!;
-              //               });
-              //             },
-              //           ),
-              //           Text('Paid by ${state.name} \n and split equally'),
-              //         ],
-              //       );
-              //     } else {
-              //       return const CircularProgressIndicator();
-              //     }
-              //   },
-              // ),
-              // BlocBuilder<SignupBloc, SignUpState>(
-              //   builder: (context, state) {
-              //     if (state is SignUpSuccess) {
-              //       return Text('Paid by ${state.name} and split equally');
-              //     } else {
-              //       return const CircularProgressIndicator();
-              //     }
-              //   },
-              // ),
-              const SizedBox(
-                width: 10,
-              ),
-
-              Row(
-                children: [
-                  Radio<String>(
-                    value: friendname,
-                    groupValue: paidby,
-                    onChanged: (value) {
-                      setState(() {
-                        paidby = value!;
-                      });
-                    },
+                  // BlocBuilder<SignupBloc, SignUpState>(
+                  //   builder: (context, state) {
+                  //     if (state is SignUpSuccess) {
+                  //       return Row(
+                  //         children: [
+                  //           Radio<String>(
+                  //             value: state.name,
+                  //             groupValue: paidby,
+                  //             onChanged: (value) {
+                  //               setState(() {
+                  //                 paidby = value!;
+                  //               });
+                  //             },
+                  //           ),
+                  //           Text('Paid by ${state.name} \n and split equally'),
+                  //         ],
+                  //       );
+                  //     } else {
+                  //       return const CircularProgressIndicator();
+                  //     }
+                  //   },
+                  // ),
+                  // BlocBuilder<SignupBloc, SignUpState>(
+                  //   builder: (context, state) {
+                  //     if (state is SignUpSuccess) {
+                  //       return Text('Paid by ${state.name} and split equally');
+                  //     } else {
+                  //       return const CircularProgressIndicator();
+                  //     }
+                  //   },
+                  // ),
+                  const SizedBox(
+                    width: 10,
                   ),
-                  Expanded(
-                      child: Text('Paid by $friendname \n and split equally')),
+
+                  Row(
+                    children: [
+                      Radio<String>(
+                        value: friendname,
+                        groupValue: paidby,
+                        onChanged: (value) {
+                          setState(() {
+                            paidby = value!;
+                          });
+                        },
+                      ),
+                      Text('Paid by $friendname \n and split equally'),
+                    ],
+                  ),
+
+                  // BlocBuilder<ContactBloc, ContactState>(
+                  //   builder: (context, state) {
+                  //     if (state is ContactSelectSuccess) {
+                  //       return Text(
+                  //           'Paid by ${state.selectedcontactname} and split equally');
+                  //     } else {
+                  //       return const CircularProgressIndicator();
+                  //     }
+                  //   },
+                  // ),
                 ],
               ),
             ],
