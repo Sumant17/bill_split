@@ -1,18 +1,18 @@
-class Transaction {
+class Transactions {
   final String? id;
   final String description;
   final double amount;
   final String payername;
 
-  Transaction({
+  Transactions({
     this.id,
     required this.description,
     required this.amount,
     required this.payername,
   });
 
-  factory Transaction.fromJson(Map<String, dynamic> json) {
-    return Transaction(
+  factory Transactions.fromJson(Map<String, dynamic> json) {
+    return Transactions(
       description: json['description'],
       amount: json['amount'],
       payername: json['payername'],

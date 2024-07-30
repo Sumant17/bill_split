@@ -2,7 +2,7 @@ import 'package:my_app/models/transaction_model.dart';
 
 class CalculateAmount {
   static double calculateTotalOwed(
-      String username, String secondperson, List<Transaction> transactions) {
+      String username, String secondperson, List<Transactions> transactions) {
     double totalowedamount = 0;
     for (var transaction in transactions) {
       final halfamount = transaction.amount / 2;

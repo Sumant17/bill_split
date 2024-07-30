@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:my_app/presentation/add_contact.dart';
 import 'package:my_app/presentation/expenses/expenses.dart';
 import 'package:my_app/presentation/home/home_bloc.dart';
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
               builder: (context, state) {
                 if (state is InitialLoaded) {
                   if (state.groups.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -79,6 +80,10 @@ class _HomePageState extends State<HomePage> {
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16),
                           ),
+                          SizedBox(
+                            height: 50,
+                          ),
+                          Lottie.asset('assets/Arrow.json'),
                         ],
                       ),
                     );

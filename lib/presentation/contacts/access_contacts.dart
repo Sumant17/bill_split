@@ -25,7 +25,7 @@ class AccessContacts extends StatelessWidget {
         elevation: 0,
       ),
       body: BlocProvider(
-        create: (context) => ContactBloc()
+        create: (context) => ContactBloc(groupname: groupname)
           ..add(
             InitialLoadContacts(),
           ),
@@ -106,19 +106,30 @@ class AccessContacts extends StatelessWidget {
                     const SizedBox(
                       height: 20,
                     ),
-                    FloatingActionButton(
-                      backgroundColor: const Color(0xff000080),
-                      foregroundColor: Colors.black,
-                      onPressed: () {
-                        accesscontactsbloc.add(
-                          OnCheckButtonClicked(
-                              selectedcontactname: selectedcontactname),
-                        );
-                        // final createGroupBloc = context.read<CreateGroupBloc>();
-                        // createGroupBloc.add(
-                        //     UpdateGroup(thirdpartyperson: selectedcontactname));
-                      },
-                      child: const Icon(Icons.check),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FloatingActionButton(
+                          backgroundColor: const Color(0xff000080),
+                          foregroundColor: Colors.black,
+                          onPressed: () {
+                            accesscontactsbloc.add(
+                              OnCheckButtonClicked(
+                                  selectedcontactname: selectedcontactname),
+                            );
+                            // final createGroupBloc = context.read<CreateGroupBloc>();
+                            // createGroupBloc.add(
+                            //     UpdateGroup(thirdpartyperson: selectedcontactname));
+                          },
+                          child: const Icon(Icons.check),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        accesscontactsbloc.isLoading
+                            ? CircularProgressIndicator()
+                            : Container(),
+                      ],
                     ),
                   ],
                 ),

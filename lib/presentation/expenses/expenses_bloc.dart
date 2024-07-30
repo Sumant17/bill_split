@@ -1,5 +1,6 @@
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:my_app/models/transaction_model.dart';
+import 'package:my_app/utils/firebase_utils.dart';
 
 // Events
 abstract class ExpensesEvent {}
@@ -22,7 +23,7 @@ class OnAddExpense extends ExpensesEvent {
 abstract class ExpensesState {}
 
 class InitialAddExpenseState extends ExpensesState {
-  final List<Transaction> transactions;
+  final List<Transactions> transactions;
 
   InitialAddExpenseState({required this.transactions});
 
@@ -30,7 +31,7 @@ class InitialAddExpenseState extends ExpensesState {
     return InitialAddExpenseState(
       transactions: (json['transactions'] as List)
           .map((transaction) =>
-              Transaction.fromJson(transaction as Map<String, dynamic>))
+              Transactions.fromJson(transaction as Map<String, dynamic>))
           .toList(),
     );
   }
@@ -75,10 +76,21 @@ class ExpensesBloc extends HydratedBloc<ExpensesEvent, ExpensesState> {
       }
     });
 
-    on<OnAddExpense>((event, emit) {
+    on<OnAddExpense>((event, emit) async {
+      try {
+        final TransactionDetail = Transactions(
+            description: event.description,
+            amount: event.amount,
+            payername: event.paidby);
+
+        await FirebaseUtils.uploadtransactiondetails(
+            TransactionDetail, groupname);
+      } catch (e) {
+        print(e);
+      }
       final currentState = state as InitialAddExpenseState;
       final transactions = currentState.transactions;
-      final newTransaction = Transaction(
+      final newTransaction = Transactions(
         description: event.description,
         amount: event.amount,
         payername: event.paidby,

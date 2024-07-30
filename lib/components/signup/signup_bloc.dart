@@ -112,6 +112,7 @@ class SignupBloc extends Bloc<SignUpEvent, SignUpState> {
         final credential = await FirebaseAuth.instance
             .createUserWithEmailAndPassword(
                 email: event.email, password: event.password);
+
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isUserLoggedIn', true);
 

@@ -1,5 +1,7 @@
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:my_app/models/groups_model.dart';
+import 'package:my_app/utils/firebase_utils.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 abstract class ContactEvent {}
@@ -21,6 +23,8 @@ abstract class ContactState {}
 class ContactsInitial extends ContactState {}
 
 class LoadingContacts extends ContactState {}
+
+class Loading extends ContactState {}
 
 class ContactsLoadSuccess extends ContactState {
   final List<Contact> contacts;
@@ -77,7 +81,9 @@ class ContactSelectSuccess extends ContactState {
 }
 
 class ContactBloc extends HydratedBloc<ContactEvent, ContactState> {
-  ContactBloc() : super(ContactsInitial()) {
+  bool isLoading = false;
+  final String groupname;
+  ContactBloc({required this.groupname}) : super(ContactsInitial()) {
     on<InitialLoadContacts>((event, emit) async {
       // final storedcontactname =
       //     fromJson(HydratedBloc.storage.read('ContactBloc') ?? {});
@@ -114,9 +120,22 @@ class ContactBloc extends HydratedBloc<ContactEvent, ContactState> {
       emit(ContactSelected(contact: event.contact));
     });
 
-    on<OnCheckButtonClicked>((event, emit) {
-      emit(
-          ContactSelectSuccess(selectedcontactname: event.selectedcontactname));
+    on<OnCheckButtonClicked>((event, emit) async {
+      isLoading = true;
+      emit(Loading());
+      try {
+        final GroupDetail = GroupsModel(
+            groupname: groupname,
+            imagepath: '',
+            names: [event.selectedcontactname]);
+
+        await FirebaseUtils.uploadgroupdetails(GroupDetail);
+        emit(ContactSelectSuccess(
+            selectedcontactname: event.selectedcontactname));
+        isLoading = false;
+      } catch (e) {
+        print(e);
+      }
     });
   }
 

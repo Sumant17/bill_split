@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_app/models/groups_model.dart';
 import 'package:my_app/models/my_user_model.dart';
+import 'package:my_app/models/transaction_model.dart';
 
 class FirebaseUtils {
   //a function to upload profile pic to firebase storage
@@ -43,6 +44,21 @@ class FirebaseUtils {
       final groupcollection = FirebaseFirestore.instance.collection('groups');
 
       await groupcollection.add(group.toJson());
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  static Future<void> uploadtransactiondetails(
+      Transactions transactions, String groupname) async {
+    try {
+      final transactioncollection =
+          FirebaseFirestore.instance.collection('transactions');
+
+      final transactionData = transactions.toJson();
+      transactionData['groupName'] = groupname;
+
+      await transactioncollection.add(transactionData);
     } catch (e) {
       throw Exception(e);
     }
